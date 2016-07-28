@@ -1,0 +1,109 @@
+﻿@model IEnumerable<MVCDemo.Models.DemoClass>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsTrue)
+        </th>
+        @foreach (var title in Model.SelectMany(x => x.CustomFields))
+        {
+            if (title.FieldName != null)
+            {
+                <th>
+                    @title.FieldName
+                </th>
+            }
+        }
+
+        @foreach(var title in Model) { 
+        using (Html.BeginForm("Create", "CustomFields", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <th>
+                <input type="text" name="FieldName" placeholder="Add a field" class="form-control" />
+                <input type="hidden" name="DemoClassId" value="@title.Id"/>
+                <input type="submit" value="Save" class="btn btn-default" />
+            </th>
+        }
+        }
+        
+        <th>
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        using (Html.BeginForm("Edit", "DemoClasses", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <tr>
+                <td>
+                    <input type="text" name="FirstName" class="form-control" value="@item.FirstName" />
+                </td>
+                <td>
+                    <input type="text" name="LastName" class="form-control" value="@item.LastName" />
+                </td>
+                <td>
+                    <div class='input-group date datetimepicker1'>
+                        <input type="text" name="Date" class="datetimepicker1 form-control" value="@item.Date" />
+                        <span class="input-group-addon no-width">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </td>
+                <td>
+                    <input id="IsTrue" name="IsTrue" type="checkbox" value="true" @(item.IsTrue ? "checked=\"checked\"" : "") />
+                </td>
+                @foreach (var value in item.CustomFields)
+                {
+                    if (value.IsCheckBox)
+                    {
+                    <td>
+                        <input type="checkbox" name="value" />
+                    </td>
+                    }
+                    else if (value.IsTextBox)
+                    {
+                        <td>
+                            <input type="text" name="value" />
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <input type="number" name="value" />
+                        </td>
+                    }
+                }
+                <td></td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }) |
+                    @Html.ActionLink("Add a Field", "Create", "CustomFields", new { id = item.Id }, null) |
+                    <input type="hidden" name="Id" value="@item.Id" />
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </td>
+            </tr>
+        }
+    }
+
+</table>
